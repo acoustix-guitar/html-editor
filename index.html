@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebStudio PRO | High Density Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Oswald:wght@400;700&family=Raleway:wght@400;700&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --panel-bg: #f9fafb;
+            --border: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --active-bg: #dbeafe;
+            --f-sans: 'Inter', -apple-system, sans-serif;
+            --f-mono: 'JetBrains Mono', 'Menlo', 'Monaco', monospace;
+            --header-h: 48px;
+            --toolbar-h: auto; /* Allow auto height for multiple rows */
+            --footer-h: 24px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--f-sans);
+            background-color: var(--bg);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        /* --- Header --- */
+        .app-header {
+            height: var(--header-h);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .brand-section { display: flex; align-items: center; gap: 1.5rem; }
+        .logo {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-weight: 700; letter-spacing: -0.025em;
+        }
+        .logo-icon {
+            width: 28px; height: 28px; background: var(--accent);
+            color: white; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+
+        .nav-menu { display: flex; gap: 1rem; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+        .nav-menu span { cursor: pointer; }
+        .nav-menu span:hover { color: var(--accent); }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+
+        .mode-switch {
+            display: flex; background: #f3f4f6; padding: 2px; border-radius: 6px; gap: 2px;
+        }
+        .mode-btn {
+            padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
+            cursor: pointer; border: none; background: transparent; color: #6b7280;
+        }
+        .mode-btn.active {
+            background: white; color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn-export {
+            background: var(--accent); color: white; padding: 6px 14px;
+            font-size: 12px; font-weight: 600; border-radius: 6px; border: none; cursor: pointer;
+        }
+        .btn-export:hover { background: var(--accent-hover); }
+
+        /* --- Toolbars --- */
+        .sub-toolbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+
+        .toolbar-row {
+            height: 38px;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            gap: 0.25rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .toolbar-row:last-child { border-bottom: none; }
+
+        .tool-sep { height: 20px; width: 1px; background: var(--border); margin: 0 6px; }
+
+        .tool-btn {
+            background: transparent; border: none; color: var(--text-primary);
+            width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .tool-btn:hover { background: #f3f4f6; }
+        .tool-btn.active { background: var(--active-bg); color: var(--accent); }
+        .tool-btn i { width: 14px; height: 14px; }
+
+        .select-ui {
+            font-size: 11px; padding: 3px 6px; border: 1px solid var(--border);
+            border-radius: 4px; background: #f9fafb; outline: none;
+            max-width: 130px;
+        }
+
+        .color-input {
+            width: 28px; height: 28px; padding: 0; border: none; background: transparent; cursor: pointer;
+        }
+
+        /* --- Main Layout --- */
+        .editor-workspace { flex: 1; display: flex; overflow: hidden; }
+
+        aside {
+            width: 220px; background: var(--surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        .right-aside { width: 240px; border-right: none; border-left: 1px solid var(--border); }
+
+        .p-header {
+            background: var(--panel-bg); border-bottom: 1px solid var(--border);
+            padding: 6px 10px; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em;
+        }
+        .p-body { flex: 1; overflow-y: auto; }
+
+        /* DOM Tree Mockup */
+        .tree-item {
+            display: flex; align-items: center; padding: 4px 10px; gap: 6px;
+            font-size: 11px; cursor: pointer; color: #4b5563;
+        }
+        .tree-item:hover { background: #eff6ff; }
+        .tree-item.active { background: #dbeafe; color: var(--accent); font-weight: 600; border-left: 2px solid var(--accent); }
+
+        /* --- Editor Stage --- */
+        .stage {
+            flex: 1; padding: 24px; display: flex; justify-content: center;
+            background-color: #e5e7eb;
+            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+        }
+
+        .viewport {
+            width: 100%; max-width: 1000px; height: 100%;
+            background: white; border: 1px solid #9ca3af; border-radius: 8px 8px 0 0;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+
+        .browser-top {
+            background: #f3f4f6; border-bottom: 1px solid #e5e7eb;
+            padding: 8px 12px; display: flex; align-items: center; gap: 12px;
+        }
+        .win-ctrl { display: flex; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .url-bar {
+            flex: 1; background: white; border: 1px solid #e5e7eb;
+            border-radius: 4px; height: 22px; display: flex; align-items: center;
+            padding: 0 10px; font-size: 10px; color: #9ca3af;
+        }
+
+        #visual-editor { width: 100%; height: 100%; border: none; }
+        #code-editor {
+            width: 100%; height: 100%; display: none;
+            padding: 1rem; font-family: var(--f-mono); font-size: 12px;
+            line-height: 1.5; color: #111827; background: #fff;
+            border: none; outline: none; resize: none; overflow: auto;
+        }
+
+        /* --- Properties Panel --- */
+        .prop-row { padding: 10px; border-bottom: 1px solid #f3f4f6; }
+        .prop-label { display: block; font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; margin-bottom: 4px; }
+        .prop-input { width: 100%; font-size: 11px; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; outline: none; }
+
+        /* --- Footer --- */
+        .footer {
+            height: var(--footer-h); background: #f9fafb; border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 10px; font-size: 10px; color: var(--text-secondary);
+        }
+
+        #loader {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.8);
+            display: none; place-items: center; z-index: 1000;
+        }
+        .spinner {
+            width: 24px; height: 24px; border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--accent); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .hidden { display: none !important; }
+
+        /* --- Dropdown Menus --- */
+        .nav-menu { display: flex; gap: 0rem; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+        .menu-item { position: relative; padding: 4px 10px; cursor: pointer; border-radius: 4px; }
+        .menu-item:hover { background: #f3f4f6; color: var(--text-primary); }
+        .menu-item.active { background: #f3f4f6; color: var(--text-primary); }
+
+        .dropdown-content {
+            position: absolute; top: 100%; left: 0; background: white;
+            min-width: 180px; border: 1px solid var(--border); border-radius: 6px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            display: none; flex-direction: column; padding: 4px 0; z-index: 500;
+            margin-top: 4px;
+        }
+        .dropdown-content.show { display: flex; }
+
+        .dropdown-link {
+            padding: 6px 12px; font-size: 11px; color: var(--text-primary);
+            text-decoration: none; display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; cursor: pointer;
+        }
+        .dropdown-link:hover { background: #eff6ff; color: var(--accent); }
+        .dropdown-sep { height: 1px; background: var(--border); margin: 4px 0; }
+        .kb-shortcut { color: #9ca3af; font-size: 9px; font-weight: 400; }
+
+        /* --- Modal Dialog --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            display: none; place-items: center; z-index: 2000;
+        }
+        .modal {
+            background: var(--surface); border-radius: 8px; width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .modal-header {
+            padding: 12px 16px; background: var(--panel-bg); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-weight: 700; font-size: 13px; }
+        .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .modal-footer {
+            padding: 12px 16px; border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: 8px;
+        }
+        .btn-secondary {
+            background: #fff; border: 1px solid var(--border); padding: 6px 12px;
+            border-radius: 4px; font-size: 12px; cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--accent); color: white; border: none; padding: 6px 12px;
+            border-radius: 4px; font-size: 12px; cursor: pointer;
+        }
+        .btn-primary:hover { background: var(--accent-hover); }
+    </style>
+</head>
+<body>
+
+    <div id="loader"><div class="spinner"></div></div>
+
+    <!-- Image Modal -->
+    <div class="modal-overlay" id="img-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Bild einfügen / Bild-Optionen</div>
+                <button class="tool-btn" onclick="closeModal('img-modal')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="prop-item">
+                    <label class="prop-label">Bildquelle</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="img-src" class="prop-input" placeholder="https://..." style="flex:1">
+                        <button class="btn-secondary" onclick="document.getElementById('img-in').click()">Datei...</button>
+                    </div>
+                </div>
+                <div class="prop-item">
+                    <label class="prop-label">Pfad-Präfix (für lokale Dateien)</label>
+                    <input type="text" id="img-prefix" class="prop-input" value="images/">
+                </div>
+                <div class="prop-item">
+                    <label class="prop-label">Alternativer Text (Alt)</label>
+                    <input type="text" id="img-alt" class="prop-input" placeholder="Bildbeschreibung">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label class="prop-label">Breite (Width)</label>
+                        <input type="text" id="img-width" class="prop-input" placeholder="auto">
+                    </div>
+                    <div>
+                        <label class="prop-label">Höhe (Height)</label>
+                        <input type="text" id="img-height" class="prop-input" placeholder="auto">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('img-modal')">Abbrechen</button>
+                <button class="btn-primary" onclick="confirmImageModal()">Einfügen</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="logo">
+                <div class="logo-icon">W</div>
+                WebStudio PRO
+            </div>
+            <nav class="nav-menu">
+                <div class="menu-item" onclick="toggleMenu(event, 'm-file')">File
+                    <div class="dropdown-content" id="m-file">
+                        <div class="dropdown-link" onclick="document.getElementById('f-in').click()"><span>Öffnen...</span><span class="kb-shortcut">Ctrl+O</span></div>
+                        <div class="dropdown-link" onclick="saveProject()"><span>Projekt Speichern</span><span class="kb-shortcut">Ctrl+S</span></div>
+                        <div class="dropdown-link" onclick="loadProject()"><span>Projekt Laden</span></div>
+                        <div class="dropdown-sep"></div>
+                        <div class="dropdown-link" onclick="exportContent()"><span>Export als HTML</span></div>
+                        <div class="dropdown-link" onclick="exportWord()"><span>Export als Word</span></div>
+                        <div class="dropdown-link" onclick="exportPDF()"><span>Export als PDF</span></div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="toggleMenu(event, 'm-edit')">Edit
+                    <div class="dropdown-content" id="m-edit">
+                        <div class="dropdown-link" onclick="exec('undo')"><span>Rückgängig</span><span class="kb-shortcut">Ctrl+Z</span></div>
+                        <div class="dropdown-link" onclick="exec('redo')"><span>Wiederholen</span><span class="kb-shortcut">Ctrl+Y</span></div>
+                        <div class="dropdown-sep"></div>
+                        <div class="dropdown-link" onclick="exec('selectAll')"><span>Alles auswählen</span><span class="kb-shortcut">Ctrl+A</span></div>
+                        <div class="dropdown-link" onclick="exec('removeFormat')"><span>Formatierung löschen</span></div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="toggleMenu(event, 'm-insert')">Insert
+                    <div class="dropdown-content" id="m-insert">
+                        <div class="dropdown-link" onclick="promptImage()"><span>Bild...</span></div>
+                        <div class="dropdown-link" onclick="promptLink()"><span>Link...</span></div>
+                        <div class="dropdown-link" onclick="promptVideo()"><span>Video...</span></div>
+                        <div class="dropdown-link" onclick="exec('insertHorizontalRule')"><span>Trennlinie</span></div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="toggleMenu(event, 'm-view')">View
+                    <div class="dropdown-content" id="m-view">
+                        <div class="dropdown-link" onclick="setMode('visual')"><span>Visual Editor</span></div>
+                        <div class="dropdown-link" onclick="setMode('code')"><span>HTML Code View</span></div>
+                        <div class="dropdown-sep"></div>
+                        <div class="dropdown-link" onclick="toggleAside()"><span>Sidebar umschalten</span></div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="toggleMenu(event, 'm-format')">Format
+                    <div class="dropdown-content" id="m-format">
+                        <div class="dropdown-link" onclick="exec('bold')"><span>Fett</span><span class="kb-shortcut">Ctrl+B</span></div>
+                        <div class="dropdown-link" onclick="exec('italic')"><span>Kursiv</span><span class="kb-shortcut">Ctrl+I</span></div>
+                        <div class="dropdown-link" onclick="exec('underline')"><span>Unterstrichen</span><span class="kb-shortcut">Ctrl+U</span></div>
+                        <div class="dropdown-sep"></div>
+                        <div class="dropdown-link" onclick="exec('justifyLeft')"><span>Linksbündig</span></div>
+                        <div class="dropdown-link" onclick="exec('justifyCenter')"><span>Zentriert</span></div>
+                        <div class="dropdown-link" onclick="exec('justifyRight')"><span>Rechtsbündig</span></div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="toggleMenu(event, 'm-table')">Table
+                    <div class="dropdown-content" id="m-table">
+                        <div class="dropdown-link" onclick="insertTable()"><span>Tabelle einfügen...</span></div>
+                        <div class="dropdown-sep"></div>
+                        <div class="dropdown-link" title="Wird bald implementiert"><span>Zeile hinzufügen</span></div>
+                        <div class="dropdown-link" title="Wird bald implementiert"><span>Spalte hinzufügen</span></div>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="toggleMenu(event, 'm-tools')">Tools
+                    <div class="dropdown-content" id="m-tools">
+                        <div class="dropdown-link" onclick="insertEmoji()"><span>Emoji Palette</span></div>
+                        <div class="dropdown-link" onclick="exec('print')"><span>Drucken</span></div>
+                        <div class="dropdown-sep"></div>
+                        <div class="dropdown-link" onclick="alert('Wörter: ' + wCount.innerText)"><span>Statistik</span></div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="header-actions">
+            <div class="mode-switch">
+                <button class="mode-btn active" id="btn-visual" onclick="setMode('visual')">Visual</button>
+                <button class="mode-btn" id="btn-code" onclick="setMode('code')">HTML Code</button>
+            </div>
+            <button class="btn-secondary" onclick="exportPDF()" style="padding: 6px 10px; font-weight: 600;">PDF</button>
+            <button class="btn-secondary" onclick="exportWord()" style="padding: 6px 10px; font-weight: 600;">Word</button>
+            <button class="btn-export" onclick="exportContent()">Projekt Exportieren</button>
+        </div>
+    </header>
+
+    <div class="sub-toolbar" id="main-toolbar">
+        <!-- Row 1: Actions & Formats -->
+        <div class="toolbar-row">
+            <button class="tool-btn" onclick="exec('undo')" title="Undo"><i data-lucide="undo"></i></button>
+            <button class="tool-btn" onclick="exec('redo')" title="Redo"><i data-lucide="redo"></i></button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="setMode(mode === 'visual' ? 'code' : 'visual')" title="Toggle Code"><i data-lucide="code"></i></button>
+            <button class="tool-btn" onclick="exec('removeFormat')" title="Clear Formatting"><i data-lucide="remove-formatting"></i></button>
+            <div class="tool-sep"></div>
+            <select class="select-ui" onchange="exec('formatBlock', this.value)" title="Formats">
+                <option value="p">Paragraph</option>
+                <option value="h1">Heading 1</option>
+                <option value="h2">Heading 2</option>
+                <option value="h3">Heading 3</option>
+                <option value="h4">Heading 4</option>
+                <option value="h5">Heading 5</option>
+                <option value="h6">Heading 6</option>
+                <option value="pre">Preformatted</option>
+            </select>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="exec('bold')" title="Bold"><i data-lucide="bold"></i></button>
+            <button class="tool-btn" onclick="exec('italic')" title="Italic"><i data-lucide="italic"></i></button>
+            <button class="tool-btn" onclick="exec('underline')" title="Underline"><i data-lucide="underline"></i></button>
+            <button class="tool-btn" onclick="exec('strikeThrough')" title="Strikethrough"><i data-lucide="strikethrough"></i></button>
+        </div>
+        
+        <!-- Row 2: Fonts & Alignment -->
+        <div class="toolbar-row">
+            <select class="select-ui" onchange="exec('fontName', this.value)" title="Font Family">
+                <option value="Inter">Inter</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Lato">Lato</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Oswald">Oswald</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Ubuntu">Ubuntu</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            <select class="select-ui" onchange="exec('fontSize', this.value)" title="Font Size">
+                <option value="1">10px</option>
+                <option value="2">13px</option>
+                <option value="3">16px</option>
+                <option value="4">18px</option>
+                <option value="5">24px</option>
+                <option value="6">32px</option>
+                <option value="7">48px</option>
+            </select>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="exec('justifyLeft')" title="Align Left"><i data-lucide="align-left"></i></button>
+            <button class="tool-btn" onclick="exec('justifyCenter')" title="Align Center"><i data-lucide="align-center"></i></button>
+            <button class="tool-btn" onclick="exec('justifyRight')" title="Align Right"><i data-lucide="align-right"></i></button>
+            <button class="tool-btn" onclick="exec('justifyFull')" title="Justify"><i data-lucide="align-justify"></i></button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="exec('insertUnorderedList')" title="Bullet List"><i data-lucide="list"></i></button>
+            <button class="tool-btn" onclick="exec('insertOrderedList')" title="Numbered List"><i data-lucide="list-ordered"></i></button>
+            <button class="tool-btn" onclick="exec('outdent')" title="Decrease Indent"><i data-lucide="indent-decrease"></i></button>
+            <button class="tool-btn" onclick="exec('indent')" title="Increase Indent"><i data-lucide="indent-increase"></i></button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="promptLink()" title="Insert Link"><i data-lucide="link"></i></button>
+            <button class="tool-btn" onclick="promptImage()" title="Insert Image"><i data-lucide="image"></i></button>
+        </div>
+        
+        <!-- Row 3: Colors & Special -->
+        <div class="toolbar-row">
+            <div style="display:flex; align-items:center; gap:0.25rem;">
+                <label style="font-size:10px; font-weight:700; color:#9ca3af; margin-right:4px;">TEXT</label>
+                <input type="color" oninput="exec('foreColor', this.value)" class="color-input">
+            </div>
+            <div class="tool-sep"></div>
+            <div style="display:flex; align-items:center; gap:0.25rem;">
+                <label style="font-size:10px; font-weight:700; color:#9ca3af; margin-right:4px;">BG</label>
+                <input type="color" oninput="exec('hiliteColor', this.value)" class="color-input">
+            </div>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="window.print()" title="Print"><i data-lucide="printer"></i></button>
+            <button class="tool-btn" onclick="promptVideo()" title="Insert Video"><i data-lucide="video"></i></button>
+            <button class="tool-btn" onclick="insertEmoji()" title="Emoji"><i data-lucide="smile"></i></button>
+            <button class="tool-btn" onclick="insertTable()" title="Table"><i data-lucide="grid"></i></button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="exec('superscript')" title="Superscript"><i data-lucide="superscript"></i></button>
+            <button class="tool-btn" onclick="exec('subscript')" title="Subscript"><i data-lucide="subscript"></i></button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="saveProject()" title="Save Project (Local)"><i data-lucide="save"></i></button>
+            <button class="tool-btn" onclick="loadProject()" title="Load Project (Local)"><i data-lucide="upload-cloud"></i></button>
+            <button class="tool-btn" style="margin-left:auto" onclick="document.getElementById('f-in').click()" title="Load File"><i data-lucide="folder-open"></i></button>
+        </div>
+    </div>
+
+    <input type="file" id="f-in" class="hidden" accept=".html,.htm" onchange="loadFile(event)">
+    <input type="file" id="img-in" class="hidden" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" onchange="uploadImage(event)">
+
+    <div class="editor-workspace">
+        <aside>
+            <div class="p-header">Seitenstruktur (DOM)</div>
+            <div class="p-body">
+                <div class="tree-item"><span>&#9662;</span> body</div>
+                <div class="tree-item" style="padding-left: 20px;"><span>&#9662;</span> main.container</div>
+                <div class="tree-item active" style="padding-left: 36px;">h1.hero-title</div>
+                <div class="tree-item" style="padding-left: 36px;">p.hero-text</div>
+                <div class="tree-item" style="padding-left: 20px;"><span>&#9656;</span> footer</div>
+            </div>
+            <div class="p-header" style="border-top:1px solid var(--border)">Assets</div>
+            <div class="p-body" style="padding:8px; display:grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                <div style="aspect-ratio:1; background:#e5e7eb; border-radius:3px;"></div>
+                <div style="aspect-ratio:1; background:#e5e7eb; border-radius:3px;"></div>
+                <div style="aspect-ratio:1; background:#e5e7eb; border-radius:3px;"></div>
+            </div>
+        </aside>
+
+        <main class="stage">
+            <div class="viewport">
+                <div class="browser-top">
+                    <div class="win-ctrl">
+                        <div class="dot" style="background:#f87171"></div>
+                        <div class="dot" style="background:#fbbf24"></div>
+                        <div class="dot" style="background:#34d399"></div>
+                    </div>
+                    <div class="url-bar" id="url-label">https://webstudio-pro.app/index.html</div>
+                </div>
+                <div style="flex:1; position:relative;">
+                    <iframe id="visual-editor"></iframe>
+                    <textarea id="code-editor" spellcheck="false"></textarea>
+                </div>
+            </div>
+        </main>
+
+        <aside class="right-aside">
+            <div class="p-header">Eigenschaften</div>
+            <div id="no-selection" style="padding: 20px; font-size: 11px; color: var(--text-secondary); text-align: center;">
+                Wählen Sie ein Element im Editor aus, um seine Eigenschaften zu bearbeiten.
+            </div>
+            <div id="selection-panel" class="p-body hidden">
+                <div class="prop-row">
+                    <label class="prop-label">Element</label>
+                    <span id="prop-tag" style="font-size: 10px; font-weight: 700; color: var(--accent);">DIV</span>
+                </div>
+                <div class="prop-row">
+                    <label class="prop-label">ID / Class</label>
+                    <input type="text" id="prop-id-class" class="prop-input" placeholder="id .class">
+                </div>
+                <div class="prop-row">
+                    <label class="prop-label">Abmessungen</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <input type="text" id="prop-width" class="prop-input" placeholder="auto (Breite)">
+                        <input type="text" id="prop-height" class="prop-input" placeholder="auto (Höhe)">
+                    </div>
+                </div>
+                <div class="prop-row">
+                    <label class="prop-label">Margin (Außenabstand)</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                        <input type="text" id="prop-margin-top" class="prop-input" placeholder="T">
+                        <input type="text" id="prop-margin-right" class="prop-input" placeholder="R">
+                        <input type="text" id="prop-margin-bottom" class="prop-input" placeholder="B">
+                        <input type="text" id="prop-margin-left" class="prop-input" placeholder="L">
+                    </div>
+                </div>
+                <div class="prop-row">
+                    <label class="prop-label">Padding (Innenabstand)</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                        <input type="text" id="prop-padding-top" class="prop-input" placeholder="T">
+                        <input type="text" id="prop-padding-right" class="prop-input" placeholder="R">
+                        <input type="text" id="prop-padding-bottom" class="prop-input" placeholder="B">
+                        <input type="text" id="prop-padding-left" class="prop-input" placeholder="L">
+                    </div>
+                </div>
+                <div class="prop-row">
+                    <label class="prop-label">Farben</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div>
+                            <span style="font-size: 9px; display: block; margin-bottom: 2px;">Text</span>
+                            <input type="color" id="prop-color" style="width: 100%; height: 24px; border: 1px solid var(--border); border-radius: 4px; padding: 0; cursor: pointer;">
+                        </div>
+                        <div>
+                            <span style="font-size: 9px; display: block; margin-bottom: 2px;">Hintergrund</span>
+                            <input type="color" id="prop-bg-color" style="width: 100%; height: 24px; border: 1px solid var(--border); border-radius: 4px; padding: 0; cursor: pointer;">
+                        </div>
+                    </div>
+                </div>
+                <div class="prop-row">
+                    <label class="prop-label">Schriftgröße</label>
+                    <input type="text" id="prop-font-size" class="prop-input" placeholder="16px">
+                </div>
+                <div class="prop-row" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
+                    <button class="btn-secondary w-full" style="font-size: 10px;" onclick="deleteSelectedElement()">Element löschen</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="footer">
+        <div style="display:flex; gap:1.5rem;">
+            <span>Elements: 42</span>
+            <span id="w-count">Words: 0</span>
+            <span id="status-msg">Editor Ready</span>
+        </div>
+        <div>
+            <span id="auto-save-status" style="color:#059669; font-weight:700">Auto-Save ON</span>
+        </div>
+    </footer>
+
+    <script>
+        const vis = document.getElementById('visual-editor');
+        const code = document.getElementById('code-editor');
+        const loader = document.getElementById('loader');
+        const statusMsg = document.getElementById('status-msg');
+        const wCount = document.getElementById('w-count');
+        const urlLabel = document.getElementById('url-label');
+        
+        lucide.createIcons();
+        let mode = 'visual';
+        let selectedElement = null;
+
+        // Selection & Properties Logic
+        function selectElement(el) {
+            if (selectedElement) {
+                selectedElement.style.outline = "";
+            }
+            if (!el || el === doc.body || el === doc.documentElement) {
+                selectedElement = null;
+                document.getElementById('no-selection').classList.remove('hidden');
+                document.getElementById('selection-panel').classList.add('hidden');
+                return;
+            }
+            selectedElement = el;
+            selectedElement.style.outline = "2px solid var(--accent)";
+            selectedElement.style.outlineOffset = "-2px";
+
+            document.getElementById('no-selection').classList.add('hidden');
+            document.getElementById('selection-panel').classList.remove('hidden');
+
+            // Update Panel Values
+            const style = vis.contentWindow.getComputedStyle(el);
+            document.getElementById('prop-tag').innerText = el.tagName;
+            document.getElementById('prop-id-class').value = (el.id ? "#" + el.id : "") + (el.className ? " ." + el.className.replace(/\s+/g, " .") : "");
+            document.getElementById('prop-width').value = el.style.width || style.width;
+            document.getElementById('prop-height').value = el.style.height || style.height;
+            document.getElementById('prop-margin-top').value = el.style.marginTop || style.marginTop;
+            document.getElementById('prop-margin-right').value = el.style.marginRight || style.marginRight;
+            document.getElementById('prop-margin-bottom').value = el.style.marginBottom || style.marginBottom;
+            document.getElementById('prop-margin-left').value = el.style.marginLeft || style.marginLeft;
+            document.getElementById('prop-padding-top').value = el.style.paddingTop || style.paddingTop;
+            document.getElementById('prop-padding-right').value = el.style.paddingRight || style.paddingRight;
+            document.getElementById('prop-padding-bottom').value = el.style.paddingBottom || style.paddingBottom;
+            document.getElementById('prop-padding-left').value = el.style.paddingLeft || style.paddingLeft;
+            document.getElementById('prop-font-size').value = el.style.fontSize || style.fontSize;
+            
+            // Hex Color Helper
+            const toHex = (c) => {
+                if (!c) return "#000000";
+                const m = c.match(/\d+/g);
+                if (!m) return "#000000";
+                return "#" + m.slice(0,3).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+            };
+            document.getElementById('prop-color').value = toHex(style.color);
+            document.getElementById('prop-bg-color').value = toHex(style.backgroundColor);
+        }
+
+        function deleteSelectedElement() {
+            if (selectedElement && confirm("Element wirklich löschen?")) {
+                selectedElement.remove();
+                selectElement(null);
+                isModified = true;
+            }
+        }
+
+        // Apply Property Changes
+        function attachPropertyListeners() {
+            const inputs = [
+                {id: 'prop-width', prop: 'width'},
+                {id: 'prop-height', prop: 'height'},
+                {id: 'prop-margin-top', prop: 'marginTop'},
+                {id: 'prop-margin-right', prop: 'marginRight'},
+                {id: 'prop-margin-bottom', prop: 'marginBottom'},
+                {id: 'prop-margin-left', prop: 'marginLeft'},
+                {id: 'prop-padding-top', prop: 'paddingTop'},
+                {id: 'prop-padding-right', prop: 'paddingRight'},
+                {id: 'prop-padding-bottom', prop: 'paddingBottom'},
+                {id: 'prop-padding-left', prop: 'paddingLeft'},
+                {id: 'prop-font-size', prop: 'fontSize'},
+                {id: 'prop-color', prop: 'color'},
+                {id: 'prop-bg-color', prop: 'backgroundColor'}
+            ];
+
+            inputs.forEach(item => {
+                const el = document.getElementById(item.id);
+                el.addEventListener('input', () => {
+                    if (selectedElement) {
+                        selectedElement.style[item.prop] = el.value;
+                        isModified = true;
+                    }
+                });
+            });
+
+            document.getElementById('prop-id-class').addEventListener('change', (e) => {
+                if (!selectedElement) return;
+                const val = e.target.value.trim();
+                const parts = val.split(/\s+/);
+                let newId = "";
+                let newClasses = [];
+                parts.forEach(p => {
+                    if (p.startsWith('#')) newId = p.substring(1);
+                    else if (p.startsWith('.')) newClasses.push(p.substring(1));
+                    else newClasses.push(p);
+                });
+                selectedElement.id = newId;
+                selectedElement.className = newClasses.join(" ");
+                isModified = true;
+            });
+        }
+
+        // Sidebar & Menu Logic
+        function toggleAside() {
+            const asides = document.querySelectorAll('aside');
+            asides.forEach(a => a.style.display = a.style.display === 'none' ? 'flex' : 'none');
+        }
+
+        function toggleMenu(e, id) {
+            e.stopPropagation();
+            const wasOpen = document.getElementById(id).classList.contains('show');
+            closeAllMenus();
+            if (!wasOpen) document.getElementById(id).classList.add('show');
+        }
+
+        function closeAllMenus() {
+            document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+        }
+
+        window.onclick = () => closeAllMenus();
+
+        // Memory for local image previews
+        const imageMap = new Map(); // localPath -> previewBlobUrl
+
+        // Code Editor History for Undo/Redo
+        let codeHistory = [""];
+        let historyIndex = 0;
+        const maxHistory = 50;
+
+        function saveCodeHistory() {
+            const current = code.value;
+            if (current !== codeHistory[historyIndex]) {
+                codeHistory = codeHistory.slice(0, historyIndex + 1);
+                codeHistory.push(current);
+                if (codeHistory.length > maxHistory) codeHistory.shift();
+                else historyIndex++;
+            }
+        }
+
+        // Initialize Iframe
+        const doc = vis.contentDocument || vis.contentWindow.document;
+        doc.open();
+        doc.write('<!DOCTYPE html><html><head><style id="editor-base-styles">body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6;outline:none;} img{max-width:100%} table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; } table th, table td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; } table th { background-color: #f9fafb; font-weight: 600; color: #111827; } table tr:nth-child(even) { background-color: #fdfdfd; } table tr:hover { background-color: #f9fafb; } <\/style><\/head><body contenteditable="true"><h1>Willkommen bei WebStudio PRO<\/h1><p>Klicken Sie hier, um den Text direkt zu bearbeiten. Wechseln Sie in den HTML-Modus für präzise Code-Anpassungen.<\/p>' + '<\/body><\/html>');
+        doc.close();
+
+        doc.body.addEventListener('click', (e) => {
+            selectElement(e.target);
+        });
+        attachPropertyListeners();
+
+        function syncVisualFromCode() {
+            const p = new DOMParser();
+            const d = p.parseFromString(code.value, 'text/html');
+            
+            // Sync Styles
+            const existingStyles = doc.head.querySelectorAll('style:not(#editor-base-styles), link[rel="stylesheet"]');
+            existingStyles.forEach(s => s.remove());
+            d.head.querySelectorAll('style, link[rel="stylesheet"]').forEach(s => {
+                doc.head.appendChild(doc.importNode(s, true));
+            });
+
+            // Sync Body
+            d.querySelectorAll('img').forEach(img => {
+                const savedPath = img.getAttribute('src');
+                if (imageMap.has(savedPath)) {
+                    img.setAttribute('data-path', savedPath);
+                    img.src = imageMap.get(savedPath);
+                }
+            });
+            doc.body.innerHTML = d.body.innerHTML;
+        }
+        
+        // Initial history
+        code.value = formatHTML(doc.body.innerHTML);
+        codeHistory[0] = code.value;
+
+        function setMode(m) {
+            if (m === mode) return;
+            
+            if (mode === 'visual' && m === 'code') {
+                selectElement(null);
+                // Before showing code, replace preview Blob-URLs with clean paths
+                const clone = doc.body.cloneNode(true);
+                clone.querySelectorAll('img[data-path]').forEach(img => {
+                    img.src = img.getAttribute('data-path');
+                    img.removeAttribute('data-path');
+                });
+                code.value = formatHTML(clone.innerHTML);
+                saveCodeHistory();
+            } else if (mode === 'code' && m === 'visual') {
+                syncVisualFromCode();
+            }
+
+            mode = m;
+            document.getElementById('btn-visual').classList.toggle('active', mode === 'visual');
+            document.getElementById('btn-code').classList.toggle('active', mode === 'code');
+            document.getElementById('main-toolbar').style.opacity = mode === 'visual' ? '1' : '0.4';
+            document.getElementById('main-toolbar').style.pointerEvents = mode === 'visual' ? 'auto' : 'none';
+
+            vis.style.display = mode === 'visual' ? 'block' : 'none';
+            code.style.display = mode === 'code' ? 'block' : 'none';
+            updateMeta();
+        }
+
+        function exec(cmd, val = null) {
+            if (cmd === 'undo') {
+                if (mode === 'visual') doc.execCommand('undo');
+                else {
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        code.value = codeHistory[historyIndex];
+                    }
+                }
+            } 
+            else if (cmd === 'redo') {
+                if (mode === 'visual') doc.execCommand('redo');
+                else {
+                    if (historyIndex < codeHistory.length - 1) {
+                        historyIndex++;
+                        code.value = codeHistory[historyIndex];
+                    }
+                }
+            }
+            else {
+                doc.execCommand(cmd, false, val);
+            }
+            
+            if (mode === 'visual') vis.contentWindow.focus();
+            updateMeta();
+        }
+
+        function promptLink() { const u = prompt("URL:", "https://"); if(u) exec('createLink', u); }
+        
+        function promptImage() {
+            document.getElementById('img-src').value = '';
+            document.getElementById('img-alt').value = '';
+            document.getElementById('img-width').value = '';
+            document.getElementById('img-height').value = '';
+            showModal('img-modal');
+        }
+
+        function showModal(id) { document.getElementById(id).style.display = 'grid'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function confirmImageModal() {
+            const src = document.getElementById('img-src').value;
+            const alt = document.getElementById('img-alt').value;
+            const width = document.getElementById('img-width').value;
+            const height = document.getElementById('img-height').value;
+
+            if (!src) { alert("Bitte geben Sie eine Bildquelle an."); return; }
+
+            // Check if we have a preview URL for this path
+            const displaySrc = imageMap.get(src) || src;
+
+            let html = `<img src="${displaySrc}" data-path="${src}"`;
+            if (alt) html += ` alt="${alt}"`;
+            if (width) html += ` width="${width}"`;
+            if (height) html += ` height="${height}"`;
+            html += '>';
+
+            exec('insertHTML', html);
+            closeModal('img-modal');
+        }
+
+        function uploadImage(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const prefix = document.getElementById('img-prefix').value || "";
+            const finalPath = prefix + file.name;
+            
+            // Create preview URL
+            const blobUrl = URL.createObjectURL(file);
+            imageMap.set(finalPath, blobUrl);
+
+            document.getElementById('img-src').value = finalPath;
+            e.target.value = ''; // Reset
+        }
+
+        function promptVideo() {
+            const u = prompt("YouTube embed URL or Video URL:", "https://");
+            if (u) {
+                let html = "";
+                if (u.includes('youtube.com') || u.includes('youtu.be')) {
+                    const id = u.split('v=')[1] || u.split('/').pop();
+                    html = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen><\/iframe>`;
+                } else {
+                    html = `<video controls width="100%"><source src="${u}" type="video/mp4"><\/source><\/video>`;
+                }
+                exec('insertHTML', html);
+            }
+        }
+
+        function insertEmoji() {
+            const emojis = ['😀', '😂', '😍', '👍', '🔥', '✨', '🚀', '❤️', '🎉', '💡'];
+            const emoji = prompt("Choose an emoji: " + emojis.join(' '), emojis[0]);
+            if (emoji) exec('insertText', emoji);
+        }
+
+        function insertTable() {
+            const rows = prompt("Anzahl der Zeilen:", "3");
+            const cols = prompt("Anzahl der Spalten:", "3");
+            if (rows && cols) {
+                let html = '<table>';
+                for (let i = 0; i < rows; i++) {
+                    html += '<tr>';
+                    for (let j = 0; j < cols; j++) {
+                        if (i === 0) {
+                            html += '<th>Header<\/th>';
+                        } else {
+                            html += '<td>Zelle<\/td>';
+                        }
+                    }
+                    html += '<\/tr>';
+                }
+                html += '<\/table><p><br><\/p>';
+                exec('insertHTML', html);
+            }
+        }
+
+        async function loadFile(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            loader.style.display = 'grid';
+            try {
+                const t = await f.text();
+                code.value = t;
+                syncVisualFromCode();
+                urlLabel.innerText = "https://webstudio-pro.app/" + f.name;
+                updateMeta();
+                statusMsg.innerText = "Geladen: " + f.name;
+            } catch (err) {
+                alert("Fehler beim Laden.");
+            } finally {
+                loader.style.display = 'none';
+                e.target.value = '';
+            }
+        }
+
+        function exportContent() {
+            const finalContent = getCleanContent();
+            const b = new Blob([finalContent], { type: 'text/html' });
+            const u = URL.createObjectURL(b);
+            const a = document.createElement('a'); 
+            a.href = u; a.download = 'website_export.html'; a.click();
+            URL.revokeObjectURL(u);
+            statusMsg.innerText = "Exportiert!";
+        }
+
+        function exportWord() {
+            const finalContent = getCleanContent();
+            // Word needs a specific header to handle UTF-8 correctly
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Exported Project" + "<\/title><\/head><body>";
+            const footer = "<\/body>" + "<\/html>";
+            const sourceHTML = header + finalContent + footer;
+            
+            const b = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
+            const u = URL.createObjectURL(b);
+            const a = document.createElement('a');
+            a.href = u; a.download = 'projekt_export.doc'; a.click();
+            URL.revokeObjectURL(u);
+            statusMsg.innerText = "Word Export bereit!";
+        }
+
+        function exportPDF() {
+            // PDF is best handled via print dialog targeting the visual iframe
+            if (mode === 'code') {
+                alert("Bitte wechseln Sie in den Visual-Modus, um ein PDF zu erstellen.");
+                return;
+            }
+            vis.contentWindow.print();
+            statusMsg.innerText = "PDF Druckdialog geöffnet";
+        }
+
+        function getCleanContent() {
+            if (mode === 'code') {
+                return code.value;
+            } else {
+                const clone = doc.documentElement.cloneNode(true);
+                // Remove selection artifacts
+                const selEl = clone.querySelector('[style*="outline"]');
+                if (selEl) {
+                    selEl.style.outline = "";
+                    selEl.style.outlineOffset = "";
+                }
+                clone.querySelectorAll('img[data-path]').forEach(img => {
+                    img.src = img.getAttribute('data-path');
+                    img.removeAttribute('data-path');
+                });
+                return clone.outerHTML;
+            }
+        }
+
+        function updateMeta() {
+            const t = doc.body.innerText || "";
+            const w = t.trim() ? t.trim().split(/\s+/).length : 0;
+            wCount.innerText = "Words: " + w;
+        }
+
+        function formatHTML(h) {
+            let res = ''; let ind = ''; let tab = '  ';
+            h.split(/>\s*</).forEach(e => {
+                if (e.match(/^\/\w/)) ind = ind.substring(tab.length);
+                res += ind + '<' + e + '>\r\n';
+                if (e.match(/^[\w\-]+(?=[^?\/]*$)/) && !e.match(/[^\/]\/$/)) ind += tab;
+            });
+            return res.substring(1, res.length - 3);
+        }
+
+        doc.addEventListener('input', () => {
+            updateMeta();
+            isModified = true;
+        });
+        code.addEventListener('input', () => {
+            updateMeta();
+            saveCodeHistory();
+            isModified = true;
+        });
+
+        // Project State Persistence
+        let isModified = false;
+        
+        function saveProject(isAuto = false) {
+            const html = mode === 'code' ? code.value : doc.body.innerHTML;
+            localStorage.setItem('webstudio_project_content', html);
+            localStorage.setItem('webstudio_project_timestamp', new Date().toISOString());
+            
+            if (!isAuto) {
+                statusMsg.innerText = "Projekt lokal gespeichert!";
+                setTimeout(() => statusMsg.innerText = "Editor Ready", 3000);
+            }
+            isModified = false;
+            document.getElementById('auto-save-status').innerText = "Gespeichert: " + new Date().toLocaleTimeString();
+        }
+
+        function loadProject() {
+            const html = localStorage.getItem('webstudio_project_content');
+            if (html) {
+                if (confirm("Möchten Sie das letzte lokal gespeicherte Projekt laden?")) {
+                    if (mode === 'code') code.value = html;
+                    else doc.body.innerHTML = html;
+                    updateMeta();
+                    statusMsg.innerText = "Projekt geladen!";
+                }
+            } else {
+                alert("Kein gespeichertes Projekt gefunden.");
+            }
+        }
+
+        // Auto-Save Loop
+        setInterval(() => {
+            if (isModified) saveProject(true);
+        }, 30000); // 30 seconds
+
+        // Load latest on start
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('webstudio_project_content');
+            if (saved && saved.trim() !== "") {
+                statusMsg.innerText = "Zuletzt gespeicherter Stand verfügbar.";
+            }
+        });
+    </script>
+</body>
+</html>

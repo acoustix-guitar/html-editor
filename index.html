@@ -40,31 +40,79 @@
         }
 
         /* --- Header --- */
-        .app-header {
+        .header-container {
+            display: flex;
+            align-items: stretch;
             height: var(--header-h);
             background: var(--surface);
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1rem;
-            flex-shrink: 0;
-            z-index: 100;
+            z-index: 1000;
+            overflow: hidden;
         }
 
-        .brand-section { display: flex; align-items: center; gap: 1.5rem; }
+        .header-scroll-wrapper {
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scroll-behavior: smooth;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-scroll-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 0 1.5rem;
+            min-width: max-content;
+            height: 100%;
+            flex: 1;
+        }
+
+        .scroll-btn {
+            background: #1e293b;
+            border: none;
+            width: 36px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1050;
+            color: #ffffff;
+            font-weight: 900;
+            flex-shrink: 0;
+            user-select: none;
+            transition: all 0.2s;
+        }
+        .scroll-btn:hover {
+            background: #000000;
+        }
+        .scroll-btn:active {
+            transform: scale(0.95);
+        }
+        .scroll-btn i {
+            width: 20px; height: 20px;
+        }
+
         .logo {
             display: flex; align-items: center; gap: 0.5rem;
             font-weight: 700; letter-spacing: -0.025em;
+            flex-shrink: 0;
         }
         .logo-icon {
-            width: 28px; height: 28px; background: var(--accent);
+            width: 26px; height: 26px; background: var(--accent);
             color: white; border-radius: 4px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
-        .nav-menu { display: flex; gap: 1rem; font-size: 15px; font-weight: 500; color: #000000; }
+        .nav-menu { display: flex; gap: 0.5rem; font-size: 15px; font-weight: 500; color: #000000; flex-shrink: 0; white-space: nowrap; }
         .nav-menu span { cursor: pointer; }
         .nav-menu span:hover { color: var(--accent); }
 
@@ -76,7 +124,9 @@
         .mode-btn {
             padding: 4px 10px; border-radius: 4px; font-size: 14px; font-weight: 600;
             cursor: pointer; border: none; background: transparent; color: #6b7280;
+            transition: all 0.2s ease;
         }
+        .mode-btn:hover:not(.active) { background: rgba(0, 0, 0, 0.05); color: var(--text-primary); }
         .mode-btn.active {
             background: white; color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
@@ -84,8 +134,10 @@
         .btn-export {
             background: var(--accent); color: white; padding: 6px 14px;
             font-size: 15px; font-weight: 600; border-radius: 6px; border: none; cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .btn-export:hover { background: var(--accent-hover); }
+        .btn-export:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-export:active { transform: translateY(0); }
 
         /* --- Toolbars --- */
         .sub-toolbar {
@@ -111,8 +163,10 @@
             width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             position: relative;
+            transition: all 0.15s ease;
         }
-        .tool-btn:hover { background: #f3f4f6; }
+        .tool-btn:hover { background: #f3f4f6; transform: scale(1.05); }
+        .tool-btn:active { transform: scale(0.95); }
         .tool-btn.active { background: var(--active-bg); color: var(--accent); }
         .tool-btn i { width: 14px; height: 14px; }
 
@@ -133,7 +187,8 @@
             width: 220px; background: var(--surface); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; flex-shrink: 0;
         }
-        .right-aside { width: 240px; border-right: none; border-left: 1px solid var(--border); }
+        .right-aside { width: 240px; border-right: none; border-left: 1px solid var(--border); transition: box-shadow 0.2s ease; }
+        .right-aside.hover-active { box-shadow: inset 0 0 0 2px #ef4444; }
 
         .p-header {
             background: var(--panel-bg); border-bottom: 1px solid var(--border);
@@ -146,9 +201,12 @@
         .tree-item {
             display: flex; align-items: center; padding: 4px 10px; gap: 6px;
             font-size: 14px; cursor: pointer; color: #000000;
+            border-left: 2px solid transparent;
+            transition: all 0.15s ease;
         }
         .tree-item:hover { background: #eff6ff; }
-        .tree-item.active { background: #dbeafe; color: var(--accent); font-weight: 600; border-left: 2px solid var(--accent); }
+        .tree-item.active { background: #dbeafe; color: var(--accent); font-weight: 600; border-left-color: var(--accent); }
+        .tree-item.hover-highlight { background: #fee2e2; border-left-color: #ef4444; color: #b91c1c; }
 
         /* --- Editor Stage --- */
         .stage {
@@ -174,15 +232,16 @@
         .device-switch {
             display: flex; background: #f3f4f6; padding: 2px; border-radius: 6px; gap: 2px;
             margin: 0 1rem;
+            flex-shrink: 0;
         }
         .device-btn {
             width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
             cursor: pointer; border: none; background: transparent; color: #6b7280;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
-        .device-btn:hover { color: var(--text-primary); background: #e5e7eb; }
+        .device-btn:hover:not(.active) { background: rgba(0,0,0,0.05); color: var(--text-primary); }
         .device-btn.active {
-            background: white; color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            background: white; color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .device-btn i { width: 14px; height: 14px; }
 
@@ -244,15 +303,15 @@
 
         /* --- Dropdown Menus --- */
         .nav-menu { display: flex; gap: 0rem; font-size: 15px; font-weight: 500; color: #000000; }
-        .menu-item { position: relative; padding: 4px 10px; cursor: pointer; border-radius: 4px; }
+        .menu-item { position: relative; padding: 4px 10px; cursor: pointer; border-radius: 4px; transition: all 0.15s ease; }
         .menu-item:hover { background: #f3f4f6; color: var(--text-primary); }
         .menu-item.active { background: #f3f4f6; color: var(--text-primary); }
 
         .dropdown-content {
-            position: absolute; top: 100%; left: 0; background: white;
+            position: fixed; background: white;
             min-width: 180px; border: 1px solid var(--border); border-radius: 6px;
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            display: none; flex-direction: column; padding: 4px 0; z-index: 500;
+            display: none; flex-direction: column; padding: 4px 0; z-index: 5000;
             margin-top: 4px;
         }
         .dropdown-content.show { display: flex; }
@@ -260,9 +319,9 @@
         .dropdown-link {
             padding: 6px 12px; font-size: 14px; color: var(--text-primary);
             text-decoration: none; display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; cursor: pointer;
+            gap: 12px; cursor: pointer; transition: all 0.15s ease;
         }
-        .dropdown-link:hover { background: #eff6ff; color: var(--accent); }
+        .dropdown-link:hover { background: #f3f4f6; color: var(--accent); padding-left: 14px; }
         .dropdown-sep { height: 1px; background: var(--border); margin: 4px 0; }
         .kb-shortcut { color: #000000; font-size: 12px; font-weight: 400; }
 
@@ -289,12 +348,16 @@
         .btn-secondary {
             background: #fff; border: 1px solid var(--border); padding: 6px 12px;
             border-radius: 4px; font-size: 15px; cursor: pointer;
+            transition: all 0.2s ease;
         }
+        .btn-secondary:hover { background: #f9fafb; border-color: #d1d5db; transform: translateY(-0.5px); }
         .btn-primary {
             background: var(--accent); color: white; border: none; padding: 6px 12px;
             border-radius: 4px; font-size: 15px; cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-primary:active { transform: translateY(0); }
 
         .template-grid {
             display: grid;
@@ -457,6 +520,26 @@
                 <button class="tool-btn" onclick="closeModal('snp-modal')"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
+                <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                    <div style="flex: 2; min-width: 200px; position: relative;">
+                        <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #94a3b8;"></i>
+                        <input type="text" id="snp-search" placeholder="Snippets durchsuchen (Name, Tags...)" 
+                               style="width: 100%; padding: 10px 10px 10px 35px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;"
+                               oninput="showSnippets()">
+                    </div>
+                    <select id="snp-filter-category" class="select-ui" style="flex: 1; min-width: 150px; height: 40px;" onchange="showSnippets()">
+                        <option value="all">Alle Kategorien</option>
+                        <option value="Headers">Headers</option>
+                        <option value="Sections">Sections</option>
+                        <option value="Cards">Cards</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Footers">Footers</option>
+                        <option value="Forms">Forms</option>
+                        <option value="Widgets">Widgets</option>
+                        <option value="Content">Content</option>
+                        <option value="Custom">Meine Komponenten</option>
+                    </select>
+                </div>
                 <div class="template-grid" id="snippet-grid">
                     <!-- Snippets will be injected here -->
                 </div>
@@ -518,102 +601,108 @@
         </div>
     </div>
 
-    <header class="app-header">
-        <div class="brand-section">
-            <div class="logo">
-                <div class="logo-icon">W</div>
-                WebStudio PRO
-            </div>
-            <nav class="nav-menu">
-                <div class="menu-item" onclick="toggleMenu(event, 'm-file')">File
-                    <div class="dropdown-content" id="m-file">
-                        <div class="dropdown-link" onclick="handleMenuClick(event, newProject)"><span>Neu</span><span class="kb-shortcut">Ctrl+N</span></div>
-                        <div class="dropdown-sep"></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => document.getElementById('f-in').click())"><span>Öffnen...</span><span class="kb-shortcut">Ctrl+O</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, saveProject)"><span>Projekt Speichern</span><span class="kb-shortcut">Ctrl+S</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, loadProject)"><span>Projekt Laden</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, loadFromUrl)"><span>Von URL/Server laden</span></div>
-                        <div class="dropdown-sep"></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, promptExport)"><span>Exportieren...</span></div>
-                    </div>
+    <div class="header-container">
+        <button class="scroll-btn" onclick="scrollNav(-300)" title="Scroll Links"><i data-lucide="chevron-left"></i></button>
+        <div class="header-scroll-wrapper" id="nav-wrapper">
+            <header class="app-header">
+                <div class="logo">
+                    <div class="logo-icon">W</div>
+                    WebStudio PRO
                 </div>
-                <div class="menu-item" onclick="toggleMenu(event, 'm-edit')">Edit
-                    <div class="dropdown-content" id="m-edit">
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('undo'))"><span>Rückgängig</span><span class="kb-shortcut">Ctrl+Z</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('redo'))"><span>Wiederholen</span><span class="kb-shortcut">Ctrl+Y</span></div>
-                        <div class="dropdown-sep"></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('selectAll'))"><span>Alles auswählen</span><span class="kb-shortcut">Ctrl+A</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('removeFormat'))"><span>Formatierung löschen</span></div>
+                
+                <nav class="nav-menu">
+                    <div class="menu-item" onclick="toggleMenu(event, 'm-file')">File
+                        <div class="dropdown-content" id="m-file">
+                            <div class="dropdown-link" onclick="handleMenuClick(event, newProject)"><span>Neu</span><span class="kb-shortcut">Ctrl+N</span></div>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => document.getElementById('f-in').click())"><span>Öffnen...</span><span class="kb-shortcut">Ctrl+O</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, saveProject)"><span>Projekt Speichern</span><span class="kb-shortcut">Ctrl+S</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, loadProject)"><span>Projekt Laden</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, loadFromUrl)"><span>Von URL/Server laden</span></div>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, promptExport)"><span>Exportieren...</span></div>
+                        </div>
                     </div>
-                </div>
-                <div class="menu-item" onclick="toggleMenu(event, 'm-insert')">Insert
-                    <div class="dropdown-content" id="m-insert">
-                        <div class="dropdown-link" onclick="handleMenuClick(event, promptImage)"><span>Bild...</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, promptLink)"><span>Link...</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, promptVideo)"><span>Video...</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('insertHorizontalRule'))"><span>Trennlinie</span></div>
+                    <div class="menu-item" onclick="toggleMenu(event, 'm-edit')">Edit
+                        <div class="dropdown-content" id="m-edit">
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('undo'))"><span>Rückgängig</span><span class="kb-shortcut">Ctrl+Z</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('redo'))"><span>Wiederholen</span><span class="kb-shortcut">Ctrl+Y</span></div>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('selectAll'))"><span>Alles auswählen</span><span class="kb-shortcut">Ctrl+A</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('removeFormat'))"><span>Formatierung löschen</span></div>
+                        </div>
                     </div>
-                </div>
-                <div class="menu-item" onclick="toggleMenu(event, 'm-view')">View
-                    <div class="dropdown-content" id="m-view">
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => setMode('visual'))"><span>Visual Editor</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => setMode('code'))"><span>HTML Code View</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => setMode('css'))"><span>Global CSS View</span></div>
-                        <div class="dropdown-sep"></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, toggleAside)"><span>Sidebar umschalten</span></div>
+                    <div class="menu-item" onclick="toggleMenu(event, 'm-insert')">Insert
+                        <div class="dropdown-content" id="m-insert">
+                            <div class="dropdown-link" onclick="handleMenuClick(event, promptImage)"><span>Bild...</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, promptLink)"><span>Link...</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, promptVideo)"><span>Video...</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('insertHorizontalRule'))"><span>Trennlinie</span></div>
+                        </div>
                     </div>
-                </div>
-                <div class="menu-item" onclick="toggleMenu(event, 'm-format')">Format
-                    <div class="dropdown-content" id="m-format">
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('bold'))"><span>Fett</span><span class="kb-shortcut">Ctrl+B</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('italic'))"><span>Kursiv</span><span class="kb-shortcut">Ctrl+I</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('underline'))"><span>Unterstrichen</span><span class="kb-shortcut">Ctrl+U</span></div>
-                        <div class="dropdown-sep"></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('justifyLeft'))"><span>Linksbündig</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('justifyCenter'))"><span>Zentriert</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('justifyRight'))"><span>Rechtsbündig</span></div>
+                    <div class="menu-item" onclick="toggleMenu(event, 'm-view')">View
+                        <div class="dropdown-content" id="m-view">
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => setMode('visual'))"><span>Visual Editor</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => setMode('code'))"><span>HTML Code View</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => setMode('css'))"><span>Global CSS View</span></div>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, toggleAside)"><span>Sidebar umschalten</span></div>
+                        </div>
                     </div>
-                </div>
-                <div class="menu-item" onclick="toggleMenu(event, 'm-table')">Table
-                    <div class="dropdown-content" id="m-table">
-                        <div class="dropdown-link" onclick="handleMenuClick(event, insertTable)"><span>Tabelle einfügen...</span></div>
-                        <div class="dropdown-sep"></div>
-                        <div class="dropdown-link" title="Wird bald implementiert"><span>Zeile hinzufügen</span></div>
-                        <div class="dropdown-link" title="Wird bald implementiert"><span>Spalte hinzufügen</span></div>
+                    <div class="menu-item" onclick="toggleMenu(event, 'm-format')">Format
+                        <div class="dropdown-content" id="m-format">
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('bold'))"><span>Fett</span><span class="kb-shortcut">Ctrl+B</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('italic'))"><span>Kursiv</span><span class="kb-shortcut">Ctrl+I</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('underline'))"><span>Unterstrichen</span><span class="kb-shortcut">Ctrl+U</span></div>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('justifyLeft'))"><span>Linksbündig</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('justifyCenter'))"><span>Zentriert</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('justifyRight'))"><span>Rechtsbündig</span></div>
+                        </div>
                     </div>
-                </div>
-                <div class="menu-item" onclick="toggleMenu(event, 'm-tools')">Tools
-                    <div class="dropdown-content" id="m-tools">
-                        <div class="dropdown-link" onclick="handleMenuClick(event, insertEmoji)"><span>Emoji Palette</span></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('print'))"><span>Drucken</span></div>
-                        <div class="dropdown-sep"></div>
-                        <div class="dropdown-link" onclick="handleMenuClick(event, () => alert('Wörter: ' + wCount.innerText))"><span>Statistik</span></div>
+                    <div class="menu-item" onclick="toggleMenu(event, 'm-table')">Table
+                        <div class="dropdown-content" id="m-table">
+                            <div class="dropdown-link" onclick="handleMenuClick(event, insertTable)"><span>Tabelle einfügen...</span></div>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-link" title="Wird bald implementiert"><span>Zeile hinzufügen</span></div>
+                            <div class="dropdown-link" title="Wird bald implementiert"><span>Spalte hinzufügen</span></div>
+                        </div>
                     </div>
-                </div>
-                <div class="menu-item" onclick="showSnippets()" style="color:var(--accent); font-weight:700;"><i data-lucide="layers" style="width:12px; height:12px; margin-right:4px;"></i>Snippets</div>
-                <div class="menu-item" onclick="showTemplates()" style="color:var(--accent); font-weight:700;"><i data-lucide="sparkles" style="width:12px; height:12px; margin-right:4px;"></i>Templates</div>
-            </nav>
-            <div class="device-switch">
-                <button class="device-btn active" id="dev-desktop" onclick="setDevice('desktop')" title="Desktop View"><i data-lucide="monitor"></i></button>
-                <button class="device-btn" id="dev-tablet" onclick="setDevice('tablet')" title="Tablet View"><i data-lucide="tablet"></i></button>
-                <button class="device-btn" id="dev-mobile" onclick="setDevice('mobile')" title="Mobile View"><i data-lucide="smartphone"></i></button>
-            </div>
-        </div>
-        <div class="header-actions">
-            <div class="mode-switch">
-                <button class="mode-btn active" id="btn-visual" onclick="setMode('visual')">Visual</button>
-                <button class="mode-btn" id="btn-code" onclick="setMode('code')">HTML Code</button>
-                <button class="mode-btn" id="btn-css" onclick="setMode('css')">Global CSS</button>
-            </div>
-            <button class="btn-secondary" onclick="exportPDF()" style="padding: 6px 10px; font-weight: 600;">PDF</button>
-            <button class="btn-secondary" onclick="exportWord()" style="padding: 6px 10px; font-weight: 600;">Word</button>
-            <button class="btn-primary" onclick="openPreview()" style="padding: 6px 14px; font-weight: 700; background: #059669; border-color: #059669;">
-                <i data-lucide="external-link" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"></i> Live-Vorschau
-            </button>
-            <button class="btn-export" onclick="exportContent()">Projekt Exportieren</button>
-        </div>
-    </header>
+                    <div class="menu-item" onclick="toggleMenu(event, 'm-tools')">Tools
+                        <div class="dropdown-content" id="m-tools">
+                            <div class="dropdown-link" onclick="handleMenuClick(event, insertEmoji)"><span>Emoji Palette</span></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => exec('print'))"><span>Drucken</span></div>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-link" onclick="handleMenuClick(event, () => alert('Wörter: ' + wCount.innerText))"><span>Statistik</span></div>
+                        </div>
+                    </div>
+                    <div class="menu-item" onclick="showSnippets()" style="color:var(--accent); font-weight:700;"><i data-lucide="layers" style="width:12px; height:12px; margin-right:4px;"></i>Snippets</div>
+                    <div class="menu-item" onclick="showTemplates()" style="color:var(--accent); font-weight:700;"><i data-lucide="sparkles" style="width:12px; height:12px; margin-right:4px;"></i>Templates</div>
+                </nav>
 
+                <div class="device-switch">
+                    <button class="device-btn active" id="dev-desktop" onclick="setDevice('desktop')" title="Desktop View"><i data-lucide="monitor"></i></button>
+                    <button class="device-btn" id="dev-tablet" onclick="setDevice('tablet')" title="Tablet View"><i data-lucide="tablet"></i></button>
+                    <button class="device-btn" id="dev-mobile" onclick="setDevice('mobile')" title="Mobile View"><i data-lucide="smartphone"></i></button>
+                </div>
+
+                <div class="header-actions">
+                    <div class="mode-switch">
+                        <button class="mode-btn active" id="btn-visual" onclick="setMode('visual')">Visual</button>
+                        <button class="mode-btn" id="btn-code" onclick="setMode('code')">HTML Code</button>
+                        <button class="mode-btn" id="btn-css" onclick="setMode('css')">Global CSS</button>
+                    </div>
+                    <button class="btn-secondary" onclick="exportPDF()" style="padding: 6px 10px; font-weight: 600;">PDF</button>
+                    <button class="btn-secondary" onclick="exportWord()" style="padding: 6px 10px; font-weight: 600;">Word</button>
+                    <button class="btn-primary" onclick="openPreview()" style="padding: 6px 14px; font-weight: 700; background: #059669; border-color: #059669;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"></i> Live-Vorschau
+                    </button>
+                    <button class="btn-export" onclick="exportContent()">Projekt Exportieren</button>
+                </div>
+            </header>
+        </div>
+        <button class="scroll-btn" onclick="scrollNav(300)" title="Scroll Rechts"><i data-lucide="chevron-right"></i></button>
+    </div>
     <div class="sub-toolbar" id="main-toolbar">
         <!-- Row 1: Actions & Formats -->
         <div class="toolbar-row">
@@ -1064,8 +1153,23 @@
                             </div>
                         </div>
                     </div>
-                    <div class="prop-row" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;">
-                        <button class="btn-secondary w-full" style="font-size: 13px;" onclick="deleteSelectedElement()">Element löschen</button>
+
+                    <div class="prop-row">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <label class="prop-label">Inline Styles (CSS)</label>
+                            <button class="btn-secondary" style="font-size: 11px; padding: 1px 4px;" onclick="copyComputedStyles()">Computed Copy</button>
+                        </div>
+                        <textarea id="prop-style-editor" class="prop-input" style="font-family: var(--f-mono); font-size: 12px; height: 100px; resize: vertical; margin-bottom: 4px;" placeholder="color: red; padding: 10px;"></textarea>
+                        <div style="font-size: 11px; color: #6b7280; line-height: 1.3;">
+                            Tipp: Hier können Sie CSS-Regeln direkt eingeben. Diese werden als <code>style</code>-Attribut gespeichert.
+                        </div>
+                    </div>
+
+                    <div class="prop-row" style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; display: flex; gap: 8px;">
+                        <button class="btn-secondary" style="flex: 1; font-size: 13px; color: var(--accent); border-color: var(--accent);" onclick="saveAsComponent()">
+                            <i data-lucide="package" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i> Speichern
+                        </button>
+                        <button class="btn-secondary" style="flex: 1; font-size: 13px; color: #ef4444; border-color: #fca5a5;" onclick="deleteSelectedElement()">Löschen</button>
                     </div>
                 </div>
             </div>
@@ -1362,6 +1466,10 @@
             document.getElementById('prop-opacity').value = el.style.opacity || style.opacity || '1';
             document.getElementById('prop-overflow').value = el.style.overflow || style.overflow || 'visible';
 
+            // Style Editor
+            const rawStyle = el.getAttribute('style') || '';
+            document.getElementById('prop-style-editor').value = rawStyle.split(';').map(s => s.trim()).filter(s => s).join(';\n') + (rawStyle.trim().endsWith(';') ? '' : (rawStyle.trim() ? ';' : ''));
+
 
             // Flexbox
             const isFlex = style.display === 'flex' || style.display === 'inline-flex';
@@ -1424,6 +1532,7 @@
                 
                 const item = document.createElement('div');
                 item.className = 'tree-item';
+                item._el = el; // Store reference for hover mapping
                 if (selectedElement === el) item.classList.add('active');
                 item.style.paddingLeft = (depth * 12 + 10) + 'px';
                 
@@ -1432,6 +1541,22 @@
                 const clsStr = el.className && typeof el.className === 'string' ? '<span style="color:#94a3b8">.' + el.className.split(' ')[0] + '</span>' : '';
                 
                 item.innerHTML = `<span>${el.children.length > 0 ? '▾' : '&nbsp;'}</span> ${tag}${idStr}${clsStr}`;
+                
+                // Hover highlight element in iframe when hovering tree item
+                item.onmouseenter = () => {
+                    item.classList.add('hover-highlight');
+                    if (el && selectedElement !== el) {
+                        el.style.outline = "2px solid #ef4444";
+                        el.style.outlineOffset = "-2px";
+                    }
+                };
+                item.onmouseleave = () => {
+                    item.classList.remove('hover-highlight');
+                    if (el && selectedElement !== el) {
+                        el.style.outline = "";
+                    }
+                };
+
                 item.onclick = (e) => {
                     e.stopPropagation();
                     selectElement(el);
@@ -1442,7 +1567,51 @@
                 
                 Array.from(el.children).forEach(child => walk(child, depth + 1));
             };
-            if (getDoc() && getDoc().body) walk(getDoc().body);
+            if (getDoc() && getDoc().body) {
+                walk(getDoc().body);
+                
+                // Set up hover listeners for the visual editor (one-time setup if possible, or refreshed)
+                const doc = getDoc();
+                if (!doc._hoverInit) {
+                    doc.addEventListener('mouseover', (e) => {
+                        const el = e.target;
+                        if (el && el.nodeType === 1 && el !== doc.body && el !== doc.documentElement) {
+                            if (selectedElement !== el) {
+                                el.style.outline = "2px dashed #ef4444";
+                                el.style.outlineOffset = "-2px";
+                            }
+                            
+                            // Find corresponding item in sidebar tree
+                            const treeItems = document.querySelectorAll('.tree-item');
+                            let foundInTree = false;
+                            treeItems.forEach(it => {
+                                if (it._el === el) {
+                                    it.classList.add('hover-highlight');
+                                    it.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                    foundInTree = true;
+                                } else {
+                                    it.classList.remove('hover-highlight');
+                                }
+                            });
+
+                            if (selectedElement === el) {
+                                document.querySelector('.right-aside').classList.add('hover-active');
+                            }
+                        }
+                    });
+                    doc.addEventListener('mouseout', (e) => {
+                        const el = e.target;
+                        if (el && el.nodeType === 1) {
+                            if (selectedElement !== el) {
+                                el.style.outline = "";
+                            }
+                            document.querySelectorAll('.tree-item').forEach(it => it.classList.remove('hover-highlight'));
+                            document.querySelector('.right-aside').classList.remove('hover-active');
+                        }
+                    });
+                    doc._hoverInit = true;
+                }
+            }
 
             // Refresh Assets
             assets.innerHTML = '';
@@ -1474,6 +1643,20 @@
                 div.style.borderRadius = '4px';
                 assets.appendChild(div);
             }
+        }
+
+        function copyComputedStyles() {
+            if (!selectedElement) return;
+            const style = vis.contentWindow.getComputedStyle(selectedElement);
+            let css = "";
+            for (let i = 0; i < style.length; i++) {
+                const prop = style[i];
+                css += `${prop}: ${style.getPropertyValue(prop)};\n`;
+            }
+            const editor = document.getElementById('prop-style-editor');
+            editor.value = css;
+            editor.focus();
+            statusMsg.innerText = "Computed styles copied to editor";
         }
 
         function deleteSelectedElement() {
@@ -1513,7 +1696,8 @@
                 {id: 'prop-border-radius', prop: 'borderRadius'},
                 {id: 'prop-box-shadow', prop: 'boxShadow'},
                 {id: 'prop-opacity', prop: 'opacity'},
-                {id: 'prop-overflow', prop: 'overflow'}
+                {id: 'prop-overflow', prop: 'overflow'},
+                {id: 'prop-style-editor', prop: 'style-editor'}
             ];
 
             inputs.forEach(item => {
@@ -1522,13 +1706,19 @@
                 el.addEventListener('input', () => {
                     if (selectedElement) {
                         let value = el.value;
-                        if ((item.prop === 'width' || item.prop === 'height') && /^\d+$/.test(value)) {
-                            value += 'px';
+                        if (item.id === 'prop-style-editor') {
+                            selectedElement.setAttribute('style', value.replace(/\n/g, ' '));
+                            // Optional: Update other panels to reflect these changes
+                            // This would be expensive to run on every keystroke for all inputs
+                        } else {
+                            if ((item.prop === 'width' || item.prop === 'height') && /^\d+$/.test(value)) {
+                                value += 'px';
+                            }
+                            selectedElement.style[item.prop] = value;
+                            if (item.id === 'prop-color') document.getElementById('prop-color-hex').value = el.value;
+                            if (item.id === 'prop-bg-color') document.getElementById('prop-bg-color-hex').value = el.value;
+                            if (item.id === 'prop-border-color') document.getElementById('prop-border-color-hex').value = el.value;
                         }
-                        selectedElement.style[item.prop] = value;
-                        if (item.id === 'prop-color') document.getElementById('prop-color-hex').value = el.value;
-                        if (item.id === 'prop-bg-color') document.getElementById('prop-bg-color-hex').value = el.value;
-                        if (item.id === 'prop-border-color') document.getElementById('prop-border-color-hex').value = el.value;
                         isModified = true;
                         updateResizer();
                     }
@@ -1732,11 +1922,23 @@
             asides.forEach(a => a.style.display = a.style.display === 'none' ? 'flex' : 'none');
         }
 
+        function scrollNav(amount) {
+            const wrapper = document.getElementById('nav-wrapper');
+            wrapper.scrollLeft += amount;
+            closeAllMenus();
+        }
+
         function toggleMenu(e, id) {
             e.stopPropagation();
-            const wasOpen = document.getElementById(id).classList.contains('show');
+            const el = document.getElementById(id);
+            const wasOpen = el.classList.contains('show');
             closeAllMenus();
-            if (!wasOpen) document.getElementById(id).classList.add('show');
+            if (!wasOpen) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                el.style.top = (rect.bottom) + 'px';
+                el.style.left = (rect.left) + 'px';
+                el.classList.add('show');
+            }
         }
 
         function closeAllMenus() {
@@ -1797,8 +1999,24 @@
         const setupIframe = () => {
             const iframeDoc = vis.contentDocument || vis.contentWindow.document;
             iframeDoc.open();
-            const baseStyles = ':root{--accent:#2563eb;}body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6;font-size:18px;outline:none;min-height:100vh;}img{max-width:100%;cursor:pointer;display:inline-block;vertical-align:middle;}table{width:100%;border-collapse:collapse;margin:20px 0;font-size:18px;}table th,table td{border:1px solid #e5e7eb;padding:12px;text-align:left;}table th{background-color:#f9fafb;font-weight:600;color:#000000;}.resizer{position:absolute;pointer-events:none;border:2px solid #2563eb;border:2px solid var(--accent);z-index:99999999!important;box-sizing:border-box;}.resizer-h{position:absolute;width:14px;height:14px;background:#2563eb;background:var(--accent);border:2px solid white;pointer-events:auto;border-radius:50%;box-sizing:border-box;box-shadow:0 2px 4px rgba(0,0,0,0.3);}.resizer-h.e{cursor:ew-resize;right:-7px;top:50%;transform:translateY(-50%);}.resizer-h.s{cursor:ns-resize;bottom:-7px;left:50%;transform:translateX(-50%);}.resizer-h.se{cursor:nwse-resize;bottom:-8px;right:-8px;width:16px;height:16px;border-width:3px;}';
-            iframeDoc.write('<!DOCTYPE html><html><head><style id="editor-base-styles">' + baseStyles + '</' + 'style></' + 'head><body contenteditable="true"><h1>Willkommen bei WebStudio PRO</' + 'h1><p>Klicken Sie hier, um den Text direkt zu bearbeiten. Wechseln Sie in den HTML-Modus für präzise Code-Anpassungen.</' + 'p></' + 'body></' + 'html>');
+            
+            const projectBaseStyles = ':root{--accent:#2563eb;}body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6;font-size:18px;outline:none;min-height:100vh;}img{max-width:100%;cursor:pointer;display:inline-block;vertical-align:middle;}table{width:100%;border-collapse:collapse;margin:20px 0;font-size:18px;}table th,table td{border:1px solid #e5e7eb;padding:12px;text-align:left;}table th{background-color:#f9fafb;font-weight:600;color:#000000;}';
+            const editorUIStyles = '.resizer{position:absolute;pointer-events:none;border:2px solid #2563eb;border:2px solid var(--accent);z-index:99999999!important;box-sizing:border-box;}.resizer-h{position:absolute;width:14px;height:14px;background:#2563eb;background:var(--accent);border:2px solid white;pointer-events:auto;border-radius:50%;box-sizing:border-box;box-shadow:0 2px 4px rgba(0,0,0,0.3);}.resizer-h.e{cursor:ew-resize;right:-7px;top:50%;transform:translateY(-50%);}.resizer-h.s{cursor:ns-resize;bottom:-7px;left:50%;transform:translateX(-50%);}.resizer-h.se{cursor:nwse-resize;bottom:-8px;right:-8px;width:16px;height:16px;border-width:3px;}';
+
+            iframeDoc.write(`<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style id="project-base-styles">${projectBaseStyles}</style>
+    <style id="custom-global-css">${cssCode.value}</style>
+    <style id="editor-ui-styles">${editorUIStyles}</style>
+</head>
+<body contenteditable="true">
+    <h1>Willkommen bei WebStudio PRO</h1>
+    <p>Klicken Sie hier, um den Text direkt zu bearbeiten. Wechseln Sie in den HTML-Modus für präzise Code-Anpassungen.</p>
+</body>
+</html>`);
             iframeDoc.close();
             
             // Custom image handles override
@@ -1914,7 +2132,7 @@
                 // Sync Head elements more comprehensively
                 if (iframeDoc.head && d.head) {
                     // Collect all editor tags to keep
-                    const keepTags = Array.from(iframeDoc.head.querySelectorAll('#editor-base-styles, #user-custom-styles, #editor-iframe-styles'));
+                    const keepTags = Array.from(iframeDoc.head.querySelectorAll('#project-base-styles, #custom-global-css, #editor-ui-styles'));
                     
                     // Clear head
                     iframeDoc.head.innerHTML = '';
@@ -1924,6 +2142,8 @@
                     
                     // Add everything from source doc head
                     Array.from(d.head.childNodes).forEach(node => {
+                        // Skip if it looks like one of our editor tags
+                        if (node.id === 'project-base-styles' || node.id === 'custom-global-css' || node.id === 'editor-ui-styles') return;
                         iframeDoc.head.appendChild(iframeDoc.importNode(node, true));
                     });
                 }
@@ -1990,7 +2210,13 @@
                         // Deep cleanup of editor-specific tags and attributes
                         const head = clone.querySelector('head');
                         if (head) {
-                            head.querySelectorAll('#editor-base-styles, #user-custom-styles, #editor-iframe-styles').forEach(t => t.remove());
+                            head.querySelectorAll('#editor-ui-styles, #editor-iframe-styles').forEach(t => t.remove());
+                            // Ensure meta tags are present for better export
+                            if (!head.querySelector('meta[charset]')) {
+                                const meta = head.ownerDocument.createElement('meta');
+                                meta.setAttribute('charset', 'UTF-8');
+                                head.prepend(meta);
+                            }
                         }
                         
                         const body = clone.querySelector('body');
@@ -2013,10 +2239,8 @@
                             });
                         }
                         
-                        let newCode = formatHTML(clone.innerHTML); 
-                        if (clone.tagName === 'HTML') {
-                            newCode = "<!DOCTYPE html>\n<html>\n" + newCode + "\n</html>";
-                        }
+                        // ALWAYS use outerHTML to get the <html> tags too
+                        let newCode = "<!DOCTYPE html>\n" + formatHTML(clone.outerHTML);
                         code.value = newCode;
                     }
                 }
@@ -2127,7 +2351,67 @@
             showModal('img-modal');
         }
 
+        let customSnippets = JSON.parse(localStorage.getItem('webstudio_custom_snippets') || '[]');
+
+        function saveAsComponent() {
+            if (!selectedElement) {
+                alert("Bitte wählen Sie zuerst ein Element aus.");
+                return;
+            }
+            
+            // For a better UX, we could use a mini-modal, but multiple prompts suffice for now or a custom implementation
+            const name = prompt("Name für diese Komponente:", "Meine Komponente");
+            if (!name) return;
+            
+            const category = prompt("Kategorie (z.B. Marketing, Sections, Headers):", "Custom");
+            const tagsInput = prompt("Tags (mit Komma getrennt):", "");
+            const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()) : [];
+            
+            // Clean the HTML before saving
+            const clone = selectedElement.cloneNode(true);
+            
+            // Basic cleanup: remove outline if present
+            clone.style.outline = "";
+            clone.style.outlineOffset = "";
+            
+            const component = {
+                name: name,
+                category: category || "Custom",
+                tags: tags,
+                html: clone.outerHTML,
+                isCustom: true,
+                createdAt: new Date().getTime()
+            };
+            
+            customSnippets.push(component);
+            localStorage.setItem('webstudio_custom_snippets', JSON.stringify(customSnippets));
+            statusMsg.innerText = `Komponente "${name}" wurde gespeichert.`;
+            
+            if (document.getElementById('snp-modal').style.display === 'flex') {
+                showSnippets();
+            }
+        }
+
+
         const snippets = [
+            {
+                name: "Modern Hero (Glass)",
+                category: "Sections",
+                html: `
+                <section style="min-height: 500px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 60px 40px; border-radius: 24px; margin: 40px 0; position: relative; overflow: hidden; color: white;">
+                    <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: rgba(99, 102, 241, 0.2); filter: blur(80px); border-radius: 50%;"></div>
+                    <div style="position: absolute; bottom: -50px; left: -50px; width: 250px; height: 250px; background: rgba(168, 85, 247, 0.15); filter: blur(60px); border-radius: 50%;"></div>
+                    <div style="backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px; border-radius: 20px; text-align: center; max-width: 800px; position: relative; z-index: 10;">
+                        <span style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc; padding: 6px 16px; border-radius: 100px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 20px;">Premium Features</span>
+                        <h1 style="font-size: 3.5rem; line-height: 1.1; margin: 0 0 20px; font-weight: 800; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Revolutionieren Sie Ihren Workflow</h1>
+                        <p style="font-size: 1.15rem; color: #94a3b8; line-height: 1.6; max-width: 600px; margin: 0 auto 30px;">Unsere Plattform bietet alles, was Sie für den Bau hochperformanter Webseiten benötigen. Ohne Kompromisse.</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button style="background: #fff; color: #0f172a; border: none; padding: 14px 28px; border-radius: 10px; font-weight: 700; cursor: pointer;">Kostenlos Starten</button>
+                            <button style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 14px 28px; border-radius: 10px; font-weight: 700; cursor: pointer;">Demo ansehen</button>
+                        </div>
+                    </div>
+                </section>`
+            },
             {
                 name: "Header w/ Background",
                 category: "Headers",
@@ -2140,6 +2424,62 @@
                         <button style="background: #6366f1; color: white; border: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; cursor: pointer;">Entdecken</button>
                     </div>
                 </header>`
+            },
+            {
+                name: "Grid Services",
+                category: "Sections",
+                html: `
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin: 60px 0;">
+                    <div style="background: #f8fafc; padding: 40px; border-radius: 20px; transition: transform 0.2s;">
+                        <div style="width: 50px; height: 50px; background: #6366f1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; margin-bottom: 20px;">⚡</div>
+                        <h3 style="margin: 0 0 10px;">High Speed</h3>
+                        <p style="margin: 0; color: #64748b; font-size: 0.95rem; line-height: 1.5;">Profitieren Sie von extrem kurzen Ladezeiten durch optimierten Code.</p>
+                    </div>
+                    <div style="background: #f8fafc; padding: 40px; border-radius: 20px;">
+                        <div style="width: 50px; height: 50px; background: #8b5cf6; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; margin-bottom: 20px;">🛡️</div>
+                        <h3 style="margin: 0 0 10px;">Secure Flow</h3>
+                        <p style="margin: 0; color: #64748b; font-size: 0.95rem; line-height: 1.5;">Verschlüsselte Datenübertragung und höchste Sicherheitsstandards.</p>
+                    </div>
+                    <div style="background: #f8fafc; padding: 40px; border-radius: 20px;">
+                        <div style="width: 50px; height: 50px; background: #ec4899; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; margin-bottom: 20px;">🎨</div>
+                        <h3 style="margin: 0 0 10px;">Custom Design</h3>
+                        <p style="margin: 0; color: #64748b; font-size: 0.95rem; line-height: 1.5;">Passen Sie jedes Detail an Ihre Marke an, ganz ohne Einschränkungen.</p>
+                    </div>
+                </div>`
+            },
+            {
+                name: "Advanced Footer",
+                category: "Footers",
+                html: `
+                <footer style="background: #0f172a; color: #94a3b8; padding: 80px 40px 40px; border-radius: 24px 24px 0 0; margin-top: 60px;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 60px;">
+                        <div>
+                            <div style="color: white; font-weight: 800; font-size: 1.5rem; margin-bottom: 20px;">STUDIO<span style="color: #6366f1;">.</span></div>
+                            <p style="line-height: 1.6; max-width: 300px;">Wir bauen die digitalen Lösungen von morgen. Innovativ, schnell und benutzerzentriert.</p>
+                        </div>
+                        <div>
+                            <h4 style="color: white; margin-top: 0; margin-bottom: 20px;">Links</h4>
+                            <ul style="list-style: none; padding: 0; line-height: 2;">
+                                <li>Home</li><li>Über uns</li><li>Projekte</li><li>Kontakt</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: white; margin-top: 0; margin-bottom: 20px;">Service</h4>
+                            <ul style="list-style: none; padding: 0; line-height: 2;">
+                                <li>Design</li><li>Development</li><li>Hosting</li><li>Marketing</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: white; margin-top: 0; margin-bottom: 20px;">Rechtliches</h4>
+                            <ul style="list-style: none; padding: 0; line-height: 2;">
+                                <li>Impressum</li><li>Datenschutz</li><li>AGB</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="padding-top: 40px; border-top: 1px solid #1e293b; text-align: center; font-size: 0.9rem;">
+                        &copy; 2024 WebStudio Digital Agency. Alle Rechte vorbehalten.
+                    </div>
+                </footer>`
             },
             {
                 name: "Standard Nav",
@@ -2313,6 +2653,78 @@
                     <div style="font-weight: 900; font-size: 1.2rem; letter-spacing: -1px;">LOGO_THREE</div>
                     <div style="font-weight: 900; font-size: 1.2rem; letter-spacing: -1px;">LOGO_FOUR</div>
                 </div>`
+            },
+            {
+                name: "Simple Data Table",
+                category: "Content",
+                html: `
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; text-align: left;">
+                    <thead>
+                        <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                            <th style="padding: 12px; font-weight: 600;">Produkt</th>
+                            <th style="padding: 12px; font-weight: 600;">Status</th>
+                            <th style="padding: 12px; font-weight: 600;">Preis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 12px;">WebStudio Pro</td>
+                            <td style="padding: 12px;"><span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 99px; font-size: 11px;">Aktiv</span></td>
+                            <td style="padding: 12px;">$29.00</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 12px;">Design Kit</td>
+                            <td style="padding: 12px;"><span style="background: #fef9c3; color: #854d0e; padding: 2px 8px; border-radius: 99px; font-size: 11px;">Pending</span></td>
+                            <td style="padding: 12px;">$15.00</td>
+                        </tr>
+                    </tbody>
+                </table>`
+            },
+            {
+                name: "Feature Comparison",
+                category: "Marketing",
+                html: `
+                <div style="margin: 40px 0; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-weight: 700; padding: 15px;">
+                        <div>Features</div><div style="text-align: center;">Kostenlos</div><div style="text-align: center; color: #6366f1;">Pro</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid #e2e8f0; padding: 15px;">
+                        <div>Unbegrenzte Seiten</div><div style="text-align: center;">✗</div><div style="text-align: center;">✓</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid #e2e8f0; padding: 15px;">
+                        <div>Eigene Domain</div><div style="text-align: center;">✗</div><div style="text-align: center;">✓</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 15px;">
+                        <div>24/7 Support</div><div style="text-align: center;">✓</div><div style="text-align: center;">✓</div>
+                    </div>
+                </div>`
+            },
+            {
+                name: "Newsletter Inline",
+                category: "Marketing",
+                html: `
+                <div style="background: #1e293b; color: white; padding: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 30px; margin: 40px 0;">
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0 0 10px;">Bleiben Sie up to date</h3>
+                        <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">Erhalten Sie die neuesten Trends direkt in Ihr Postfach.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex: 1;">
+                        <input type="email" placeholder="E-Mail" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+                        <button style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 700;">Join</button>
+                    </div>
+                </div>`
+            },
+            {
+                name: "Modern Minimal Nav",
+                category: "Headers",
+                html: `
+                <nav style="display: flex; justify-content: center; align-items: center; padding: 30px; gap: 40px; border-bottom: 1px solid #f1f5f9;">
+                    <span style="font-weight: 500; cursor: pointer;">Work</span>
+                    <span style="font-weight: 500; cursor: pointer;">Services</span>
+                    <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: -1px;">STUDIO.</div>
+                    <span style="font-weight: 500; cursor: pointer;">About</span>
+                    <span style="font-weight: 500; cursor: pointer;">Contact</span>
+                </nav>`
             },
             {
                 name: "CTA Banner",
@@ -2559,16 +2971,98 @@
                         <div style="font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Support</div>
                     </div>
                 </div>`
+            },
+            {
+                name: "Advanced Accordion",
+                category: "Widgets",
+                html: `
+                <div style="max-width: 700px; margin: 40px auto; font-family: sans-serif;">
+                    <div style="margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                        <div style="padding: 16px 20px; background: #f8fafc; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600;">
+                            <span>Welche Zahlungsmethoden werden unterstützt?</span>
+                            <span style="color: #6366f1;">+</span>
+                        </div>
+                        <div style="padding: 20px; border-top: 1px solid #e2e8f0; background: white; font-size: 0.95rem; color: #4b5563;">
+                            Wir unterstützen alle gängigen Kreditkarten, PayPal sowie Banküberweisung und SEPA-Lastschrift für unsere Unternehmenskunden.
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                        <div style="padding: 16px 20px; background: #f8fafc; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600;">
+                            <span>Gibt es eine Geld-zurück-Garantie?</span>
+                            <span style="color: #6366f1;">+</span>
+                        </div>
+                        <div style="padding: 20px; border-top: 1px solid #e2e8f0; background: white; font-size: 0.95rem; color: #4b5563; display: none;">
+                            Ja, wir bieten eine 30-tägige Zufriedenheitsgarantie für alle unsere kostenpflichtigen Pläne an.
+                        </div>
+                    </div>
+                </div>`
+            },
+            {
+                name: "Pricing Grid (3 cols)",
+                category: "Marketing",
+                html: `
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 60px 0; max-width: 1000px; margin-left: auto; margin-right: auto;">
+                    <!-- Basic -->
+                    <div style="padding: 40px; border: 1px solid #e2e8f0; border-radius: 20px; background: white;">
+                        <h4 style="margin: 0 0 10px; color: #64748b;">Starter</h4>
+                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">$0<span style="font-size: 1rem; color: #94a3b8;">/Mo</span></div>
+                        <ul style="list-style: none; padding: 0; margin: 0 0 30px; font-size: 0.95rem; color: #64748b; line-height: 2;">
+                            <li>✓ 1 Projekt</li><li>✓ Community Support</li><li>✓ Basis-Templates</li>
+                        </ul>
+                        <button style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; background: transparent; border-radius: 10px; font-weight: 700; cursor: pointer;">Kostenlos Starten</button>
+                    </div>
+                    <!-- Pro -->
+                    <div style="padding: 40px; border: 2px solid #6366f1; border-radius: 20px; background: white; position: relative; transform: scale(1.05); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+                        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #6366f1; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">BELIEBTESTE</div>
+                        <h4 style="margin: 0 0 10px; color: #6366f1;">Pro</h4>
+                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">$49<span style="font-size: 1rem; color: #94a3b8;">/Mo</span></div>
+                        <ul style="list-style: none; padding: 0; margin: 0 0 30px; font-size: 0.95rem; color: #64748b; line-height: 2;">
+                            <li>✓ Unbegrenzte Projekte</li><li>✓ Priorisierter Support</li><li>✓ Eigene Domain</li><li>✓ Analytics Tool</li>
+                        </ul>
+                        <button style="width: 100%; padding: 12px; border: none; background: #6366f1; color: white; border-radius: 10px; font-weight: 700; cursor: pointer;">Jetzt Upgraden</button>
+                    </div>
+                    <!-- Enterprise -->
+                    <div style="padding: 40px; border: 1px solid #e2e8f0; border-radius: 20px; background: white;">
+                        <h4 style="margin: 0 0 10px; color: #64748b;">Enterprise</h4>
+                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">$99<span style="font-size: 1rem; color: #94a3b8;">/Mo</span></div>
+                        <ul style="list-style: none; padding: 0; margin: 0 0 30px; font-size: 0.95rem; color: #64748b; line-height: 2;">
+                            <li>✓ Alles aus Pro</li><li>✓ Eigener Account Manager</li><li>✓ API Zugriff</li><li>✓ Individuelle Verträge</li>
+                        </ul>
+                        <button style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; background: transparent; border-radius: 10px; font-weight: 700; cursor: pointer;">Vertrieb kontaktieren</button>
+                    </div>
+                </div>`
             }
         ];
 
         function showSnippets() {
             const grid = document.getElementById('snippet-grid');
+            const searchQuery = document.getElementById('snp-search').value.toLowerCase();
+            const filterCategory = document.getElementById('snp-filter-category').value;
+            
             grid.innerHTML = '';
-            snippets.forEach((snp, idx) => {
+            
+            const allSnippets = [
+                ...snippets.map((s, i) => ({ ...s, id: i, source: 'default' })),
+                ...customSnippets.map((s, i) => ({ ...s, id: i, source: 'custom' }))
+            ];
+
+            const filteredSnippets = allSnippets.filter(snp => {
+                const matchesSearch = snp.name.toLowerCase().includes(searchQuery) || 
+                                     (snp.tags && snp.tags.some(t => t.toLowerCase().includes(searchQuery))) ||
+                                     snp.category.toLowerCase().includes(searchQuery);
+                
+                const matchesCategory = filterCategory === 'all' || 
+                                       (filterCategory === 'Custom' && snp.source === 'custom') || 
+                                       snp.category === filterCategory;
+                
+                return matchesSearch && matchesCategory;
+            });
+
+            filteredSnippets.forEach((snp) => {
                 const card = document.createElement('div');
                 card.className = 'template-card';
-                card.onclick = () => insertSnippet(idx);
+                card.style.position = 'relative';
+                card.onclick = () => insertSnippet(snp.id, snp.source);
                 
                 const iconMap = {
                     "Headers": "navigation",
@@ -2577,33 +3071,76 @@
                     "Cards": "credit-card",
                     "Content": "type",
                     "Marketing": "megaphone",
-                    "Widgets": "cpu"
+                    "Widgets": "cpu",
+                    "Sections": "layout-grid",
+                    "Custom": "package"
                 };
+
+                let tagsHtml = '';
+                if (snp.tags && snp.tags.length > 0) {
+                    tagsHtml = `<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;">
+                        ${snp.tags.map(t => `<span style="background: rgba(99, 102, 241, 0.1); color: #6366f1; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;">#${t}</span>`).join('')}
+                    </div>`;
+                }
 
                 card.innerHTML = `
                     <div class="template-preview" style="background: #f9fafb;">
                         <i data-lucide="${iconMap[snp.category] || 'box'}" style="width: 32px; height: 32px; color: #6366f1;"></i>
                     </div>
                     <div class="template-info">
-                        <div style="font-size: 9px; color: var(--accent); font-weight: 800; text-transform: uppercase; margin-bottom: 4px;">${snp.category}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <div style="font-size: 9px; color: var(--accent); font-weight: 800; text-transform: uppercase;">${snp.category}</div>
+                            ${snp.source === 'custom' ? '<span style="font-size: 8px; background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 4px; font-weight: 700;">USER</span>' : ''}
+                        </div>
                         <div class="template-name">${snp.name}</div>
+                        ${tagsHtml}
                     </div>
                 `;
+
+                if (snp.source === 'custom') {
+                    const delBtn = document.createElement('button');
+                    delBtn.innerHTML = '&times;';
+                    delBtn.title = "Komponente löschen";
+                    delBtn.style.cssText = `
+                        position: absolute; top: 8px; right: 8px; background: #fee2e2; color: #ef4444; 
+                        border: none; width: 22px; height: 22px; border-radius: 6px; cursor: pointer;
+                        display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 10;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    `;
+                    delBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm("Komponente wirklich löschen?")) {
+                            customSnippets.splice(snp.id, 1);
+                            localStorage.setItem('webstudio_custom_snippets', JSON.stringify(customSnippets));
+                            showSnippets();
+                        }
+                    };
+                    card.appendChild(delBtn);
+                }
+
                 grid.appendChild(card);
             });
             lucide.createIcons();
             showModal('snp-modal');
         }
 
-        function insertSnippet(idx) {
-            const html = snippets[idx].html;
-            vis.contentWindow.focus();
-            getDoc().execCommand('insertHTML', false, html);
+        function insertSnippet(idx, source = 'default') {
+            const snp = source === 'custom' ? customSnippets[idx] : snippets[idx];
+            if (!snp) return;
+
+            const html = snp.html;
+            
+            if (mode === 'visual') {
+                vis.contentWindow.focus();
+                getDoc().execCommand('insertHTML', false, html);
+                statusMsg.innerText = "Snippet eingefügt: " + snp.name;
+                isModified = true;
+                saveHistory();
+                refreshSidebar();
+            } else {
+                insertCodeAtCursor(html);
+            }
             closeModal('snp-modal');
-            statusMsg.innerText = "Snippet eingefügt: " + snippets[idx].name;
-            isModified = true;
-            saveHistory();
-            refreshSidebar();
         }
 
         function promptExport() {
@@ -3027,7 +3564,20 @@
         function applyTemplate(idx) {
             const tpl = templates[idx];
             if (confirm(`Möchten Sie das Template "${tpl.name}" laden? Bestehender Inhalt geht verloren.`)) {
-                const fullHTML = `<!DOCTYPE html><html><head><style id="editor-base-styles">body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6;font-size:18px;outline:none;} img{max-width:100%} table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 18px; } table th, table td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; } table th { background-color: #f9fafb; font-weight: 600; color: #000000; } table tr:nth-child(even) { background-color: #fdfdfd; } table tr:hover { background-color: #f9fafb; } <\/style><style>${tpl.css}<\/style><\/head><body contenteditable="true">${tpl.html}<\/body><\/html>`;
+                const projectBaseStyles = ':root{--accent:#2563eb;}body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6;font-size:18px;outline:none;min-height:100vh;}img{max-width:100%;cursor:pointer;display:inline-block;vertical-align:middle;}table{width:100%;border-collapse:collapse;margin:20px 0;font-size:18px;}table th,table td{border:1px solid #e5e7eb;padding:12px;text-align:left;}table th{background-color:#f9fafb;font-weight:600;color:#000000;}';
+                
+                const fullHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style id="project-base-styles">${projectBaseStyles}</style>
+    <style id="custom-global-css">${tpl.css}</style>
+</head>
+<body contenteditable="true">${tpl.html}</body>
+</html>`;
+                
+                cssCode.value = tpl.css;
                 code.value = formatHTML(fullHTML);
                 syncVisualFromCode();
                 closeModal('tpl-modal');
@@ -3247,8 +3797,9 @@
         }
 
         function getCleanContent() {
+            let content = "";
             if (mode === 'code' || !isModified) {
-                return code.value;
+                content = code.value;
             } else {
                 const clone = getDoc().documentElement.cloneNode(true);
                 // Remove selection artifacts
@@ -3262,15 +3813,44 @@
                 // Cleanup editor tags
                 const head = clone.querySelector('head');
                 if (head) {
-                    head.querySelectorAll('#editor-base-styles, #user-custom-styles, #editor-iframe-styles').forEach(t => t.remove());
+                    head.querySelectorAll('#editor-ui-styles, #editor-iframe-styles').forEach(t => t.remove());
+                    // Consolidate global CSS if panel is more recent or desired
+                    const customStyle = head.querySelector('#custom-global-css');
+                    if (customStyle) customStyle.textContent = cssCode.value;
                 }
 
-                clone.querySelectorAll('img[data-path]').forEach(img => {
-                    img.src = img.getAttribute('data-path');
-                    img.removeAttribute('data-path');
-                });
-                return clone.outerHTML;
+                const body = clone.querySelector('body');
+                if (body) {
+                    body.removeAttribute('contenteditable');
+                    body.removeAttribute('spellcheck');
+                    
+                    clone.querySelectorAll('img[data-path]').forEach(img => {
+                        img.src = img.getAttribute('data-path');
+                        img.removeAttribute('data-path');
+                    });
+                }
+
+                content = "<!DOCTYPE html>\n" + clone.outerHTML;
             }
+
+            // Safety Wrap: If current content is NOT a full HTML doc, wrap it
+            if (!content.toLowerCase().includes('<html') || !content.toLowerCase().includes('<body')) {
+                const projectBaseStyles = ':root{--accent:#2563eb;}body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6;font-size:18px;outline:none;min-height:100vh;}img{max-width:100%;cursor:pointer;display:inline-block;vertical-align:middle;}table{width:100%;border-collapse:collapse;margin:20px 0;font-size:18px;}table th,table td{border:1px solid #e5e7eb;padding:12px;text-align:left;}table th{background-color:#f9fafb;font-weight:600;color:#000000;}';
+                content = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style id="project-base-styles">${projectBaseStyles}</style>
+    <style id="custom-global-css">${cssCode.value}</style>
+</head>
+<body>
+${content}
+</body>
+</html>`;
+            }
+
+            return formatHTML(content);
         }
 
         function updateMeta() {
@@ -3332,7 +3912,6 @@
 
         // Project State Persistence
         function newProject() {
-            const iframeDoc = vis.contentDocument || vis.contentWindow.document;
             if (isModified && !confirm("Nicht gespeicherte Änderungen gehen verloren. Fortfahren?")) return;
             
             isModified = false;
@@ -3347,16 +3926,27 @@
     </ul>
 </div>`;
 
-            iframeDoc.body.innerHTML = boilerplate;
             cssCode.value = "";
-            syncStylesFromCssPanel();
             
-            if (mode === 'code') {
-                const clone = iframeDoc.body.cloneNode(true);
-                code.value = formatHTML(clone.innerHTML);
-            }
+            const projectBaseStyles = ':root{--accent:#2563eb;}body{font-family:sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6;font-size:18px;outline:none;min-height:100vh;}img{max-width:100%;cursor:pointer;display:inline-block;vertical-align:middle;}table{width:100%;border-collapse:collapse;margin:20px 0;font-size:18px;}table th,table td{border:1px solid #e5e7eb;padding:12px;text-align:left;}table th{background-color:#f9fafb;font-weight:600;color:#000000;}';
+            const fullHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style id="project-base-styles">${projectBaseStyles}</style>
+    <style id="custom-global-css"></style>
+</head>
+<body contenteditable="true">
+${boilerplate}
+</body>
+</html>`;
+
+            code.value = formatHTML(fullHTML);
+            syncVisualFromCode();
             
             // Reset History
+            const iframeDoc = vis.contentDocument || vis.contentWindow.document;
             history = [{ html: formatHTML(iframeDoc.body.innerHTML), css: "" }];
             historyIndex = 0;
             
@@ -3378,7 +3968,7 @@
                     // Clean editor injected tags
                     const head = clone.querySelector('head');
                     if (head) {
-                        head.querySelectorAll('#editor-base-styles, #user-custom-styles, #editor-iframe-styles').forEach(t => t.remove());
+                        head.querySelectorAll('#editor-ui-styles, #editor-iframe-styles').forEach(t => t.remove());
                     }
                     const body = clone.querySelector('body');
                     if (body) {
@@ -3399,10 +3989,7 @@
                             }
                         });
                     }
-                    html = clone.innerHTML;
-                    if (clone.tagName === 'HTML') {
-                        html = "<!DOCTYPE html>\n<html>\n" + html + "\n</html>";
-                    }
+                    html = "<!DOCTYPE html>\n" + clone.outerHTML;
                 }
             }
             const css = cssCode.value;
@@ -3423,8 +4010,23 @@
             const css = localStorage.getItem('webstudio_project_css') || "";
             if (html) {
                 if (confirm("Möchten Sie das letzte lokal gespeicherte Projekt laden?")) {
-                    if (mode === 'code') code.value = html;
-                    else getDoc().body.innerHTML = html;
+                    if (mode === 'code') {
+                        code.value = html;
+                    } else {
+                        // Better loading for full document
+                        const p = new DOMParser();
+                        const d = p.parseFromString(html, 'text/html');
+                        if (d && d.body) {
+                            getDoc().body.innerHTML = d.body.innerHTML;
+                            // Optionally sync head if needed
+                            if (d.head) {
+                                Array.from(d.head.children).forEach(node => {
+                                    if (node.id === 'project-base-styles' || node.id === 'custom-global-css' || node.id === 'editor-ui-styles') return;
+                                    getDoc().head.appendChild(getDoc().importNode(node, true));
+                                });
+                            }
+                        }
+                    }
                     cssCode.value = css;
                     syncStylesFromCssPanel();
                     updateMeta();
